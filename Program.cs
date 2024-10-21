@@ -1,4 +1,6 @@
 using LibraNet.Data;
+using LibraNet.Repository;
+using LibraNet.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +13,7 @@ builder.Services.AddDbContext<LibraNetContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"),
     assembly => assembly.MigrationsAssembly(typeof(LibraNetContext).Assembly.FullName));
 });
+builder.Services.AddScoped<IBaseRepository, BaseRepository>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
