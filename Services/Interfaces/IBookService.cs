@@ -6,5 +6,5 @@ namespace LibraNet.Services.Interfaces;
 public interface IBookService
 {
     Task<Book> GetBookByIdAsync(int id);
-    Task<IEnumerable<BookDto>> GetBooksAsync();
+    Task<IEnumerable<BookListDto>> GetBooksAsync();
 }

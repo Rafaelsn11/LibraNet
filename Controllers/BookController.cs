@@ -1,3 +1,4 @@
+using LibraNet.Models.Dtos.Book;
 using LibraNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,5 +27,11 @@ public class BookController : ControllerBase
     {
         var book = await _service.GetBookByIdAsync(id);
         return Ok(book);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post(BookCreateDto book)
+    {
+
     }
 }

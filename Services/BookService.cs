@@ -22,6 +22,8 @@ public class BookService : IBookService
         return book;
     }
 
-    public Task<IEnumerable<BookDto>> GetBooksAsync()
+    public Task<IEnumerable<BookListDto>> GetBooksAsync()
         => _repository.GetBooksAsync();
+
+
 }

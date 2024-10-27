@@ -20,8 +20,8 @@ public class BookRepository : BaseRepository, IBookRepository
             .ThenInclude(e => e.Media)
             .Where(x => x.Id == id).FirstOrDefaultAsync();
 
-    public async Task<IEnumerable<BookDto>> GetBooksAsync()
+    public async Task<IEnumerable<BookListDto>> GetBooksAsync()
         => await _context.Books
-            .Select(x => new BookDto { Id = x.Id, Title = x.Title })
+            .Select(x => new BookListDto(x.Id, x.Title))
             .ToListAsync();
 }
