@@ -30,8 +30,10 @@ public class BookController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(BookCreateDto book)
+    public async Task<IActionResult> Post([FromBody] BookCreateDto book)
     {
+        var bookCreated = await _service.BookCreate(book);
 
+        return Created(string.Empty, bookCreated);
     }
 }

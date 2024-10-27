@@ -1,3 +1,3 @@
 namespace LibraNet.Models.Dtos.Book;
 
-public record BookCreateDto(int Id, string Title, string Subject);
+public record BookCreateDto(string Title, string Subject);
