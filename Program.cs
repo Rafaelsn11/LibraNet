@@ -16,6 +16,7 @@ builder.Services.AddDbContext<LibraNetContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"),
     assembly => assembly.MigrationsAssembly(typeof(LibraNetContext).Assembly.FullName));
 });
+builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IBaseRepository, BaseRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
