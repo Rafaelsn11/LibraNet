@@ -48,5 +48,12 @@ public class BookController : ControllerBase
         return Ok(bookUpdate);
     }
 
-    
+    [HttpDelete]
+    [Route("{id}")]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        await _service.BookDeleteAsync(id);
+
+        return NoContent();
+    }
 }

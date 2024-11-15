@@ -58,4 +58,18 @@ public class BookService : IBookService
 
         return new BookUpdateViewDto(bookUpdate.Title, bookUpdate.Subject);
     }
+
+    public async Task BookDeleteAsync(int id)
+    {
+        if (id <= 0)
+            throw new ArgumentException("ID invalid");
+
+        var bookDB = await _repository.GetBookByIdAsync(id);
+
+        if (bookDB == null)
+            throw new Exception("Book not found");
+
+        _repository.Delete(bookDB);
+        await _repository.SaveChangesAsync();
+    }
 }
