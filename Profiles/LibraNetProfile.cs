@@ -8,6 +8,10 @@ public class LibraNetProfile : Profile
 {
     public LibraNetProfile()
     {
-        CreateMap<BookUpdateDto, Book>();
+        CreateMap<BookUpdateDto, Book>()
+            .ForAllMembers(opts => opts.Condition((src, dest, srcMember) =>
+            srcMember != null &&
+            (srcMember is not string || !string.IsNullOrEmpty((string)srcMember)) &&
+            (srcMember is not int || (int)srcMember != 0)));
     }
 }

@@ -22,8 +22,9 @@ public class BookController : ControllerBase
         return Ok(books);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [HttpGet]
+    [Route("{id}")]
+    public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var book = await _service.GetBookByIdAsync(id);
         return Ok(book);
@@ -32,8 +33,20 @@ public class BookController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] BookCreateDto book)
     {
-        var bookCreated = await _service.BookCreate(book);
+        var bookCreated = await _service.BookCreateAsync(book);
 
         return Created(string.Empty, bookCreated);
     }
+
+    [HttpPut]
+    [Route("{id}")]
+    public async Task<IActionResult> Put([FromRoute] int id,
+        [FromBody] BookUpdateDto book)
+    {
+        var bookUpdate = await _service.BookUpdateAsync(id, book);
+
+        return Ok(bookUpdate);
+    }
+
+    
 }

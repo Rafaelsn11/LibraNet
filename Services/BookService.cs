@@ -1,3 +1,4 @@
+using AutoMapper;
 using LibraNet.Models.Dtos.Book;
 using LibraNet.Models.Entities;
 using LibraNet.Repository.Interfaces;
@@ -8,9 +9,11 @@ namespace LibraNet.Services;
 public class BookService : IBookService
 {
     private readonly IBookRepository _repository;
-    public BookService(IBookRepository repository)
+    private readonly IMapper _mapper;
+    public BookService(IBookRepository repository, IMapper mapper)
     {
         _repository = repository;
+        _mapper = mapper;
     }
 
     public async Task<Book> GetBookByIdAsync(int id)
@@ -25,7 +28,7 @@ public class BookService : IBookService
     public async Task<IEnumerable<BookListDto>> GetBooksAsync()
         => await _repository.GetBooksAsync();
 
-    public async Task<BookDto> BookCreate(BookCreateDto book)
+    public async Task<BookDto> BookCreateAsync(BookCreateDto book)
     {
         if (book == null || string.IsNullOrWhiteSpace(book.Title) || string.IsNullOrWhiteSpace(book.Subject))
             throw new ArgumentNullException("Invalid data - title and subject are required");
@@ -40,5 +43,19 @@ public class BookService : IBookService
         await _repository.SaveChangesAsync();
 
         return new BookDto(entity.Id, entity.Title, entity.Subject);
+    }
+
+    public async Task<BookUpdateViewDto> BookUpdateAsync(int id, BookUpdateDto book)
+    {
+        var bookDB = await _repository.GetBookByIdAsync(id);
+        if (bookDB == null)
+            throw new Exception("Book not found");
+
+        var bookUpdate = _mapper.Map(book, bookDB);
+
+        _repository.Update(bookUpdate);
+        await _repository.SaveChangesAsync();
+
+        return new BookUpdateViewDto(bookUpdate.Title, bookUpdate.Subject);
     }
 }

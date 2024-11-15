@@ -7,5 +7,6 @@ public interface IBookService
 {
     Task<Book> GetBookByIdAsync(int id);
     Task<IEnumerable<BookListDto>> GetBooksAsync();
-    Task<BookDto> BookCreate(BookCreateDto book);
+    Task<BookDto> BookCreateAsync(BookCreateDto book);
+    Task<BookUpdateViewDto> BookUpdateAsync(int id, BookUpdateDto book);
 }
