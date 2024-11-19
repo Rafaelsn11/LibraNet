@@ -19,7 +19,10 @@ builder.Services.AddDbContext<LibraNetContext>(options =>
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IBaseRepository, BaseRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IMediaRepository, MediaRepository>();
+
 builder.Services.AddScoped<IBookService, BookService>();
+builder.Services.AddScoped<IMediaService, MediaService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
