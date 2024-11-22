@@ -1,4 +1,5 @@
 using AutoMapper;
+using LibraNet.Exceptions.ExceptionsBase;
 using LibraNet.Models.Dtos.Book;
 using LibraNet.Models.Entities;
 using LibraNet.Repository.Interfaces;
@@ -16,11 +17,11 @@ public class BookService : IBookService
         _mapper = mapper;
     }
 
-    public async Task<Book> GetBookByIdAsync(int id)
+    public async Task<BookDetailDto> GetBookByIdAsync(int id)
     {
         var book = await _repository.GetBookByIdAsync(id);
         if (book == null)
-            throw new Exception("Book not found");
+            throw new NotFoundException("Book not found");
 
         return book;
     }
@@ -30,8 +31,10 @@ public class BookService : IBookService
 
     public async Task<BookDto> BookCreateAsync(BookCreateDto book)
     {
-        if (book == null || string.IsNullOrWhiteSpace(book.Title) || string.IsNullOrWhiteSpace(book.Subject))
-            throw new ArgumentNullException("Invalid data - title and subject are required");
+        var errors = ValidateBookCreate(book);
+
+        if (errors.Count > 0)
+            throw new ErrorOrValidationException(errors);
 
         var entity = new Book
         {
@@ -44,12 +47,23 @@ public class BookService : IBookService
 
         return new BookDto(entity.Id, entity.Title, entity.Subject);
     }
+    private List<string> ValidateBookCreate(BookCreateDto book)
+    {
+        var messageErrors = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(book.Title))
+            messageErrors.Add("Title invalid");
+        if (string.IsNullOrWhiteSpace(book.Subject))
+            messageErrors.Add("Subject invalid");
+
+        return messageErrors;
+    }
 
     public async Task<BookUpdateViewDto> BookUpdateAsync(int id, BookUpdateDto book)
     {
         var bookDB = await _repository.GetBookByIdAsync(id);
         if (bookDB == null)
-            throw new Exception("Book not found");
+            throw new NotFoundException("Book not found");
 
         var bookUpdate = _mapper.Map(book, bookDB);
 
@@ -61,13 +75,10 @@ public class BookService : IBookService
 
     public async Task BookDeleteAsync(int id)
     {
-        if (id <= 0)
-            throw new ArgumentException("ID invalid");
-
         var bookDB = await _repository.GetBookByIdAsync(id);
 
         if (bookDB == null)
-            throw new Exception("Book not found");
+            throw new NotFoundException("Book not found");
 
         _repository.Delete(bookDB);
         await _repository.SaveChangesAsync();

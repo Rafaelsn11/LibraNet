@@ -1,3 +1,4 @@
+using LibraNet.Exceptions.ExceptionsBase;
 using LibraNet.Models.Dtos.Media;
 using LibraNet.Repository.Interfaces;
 using LibraNet.Services.Interfaces;
@@ -17,7 +18,7 @@ public class MediaService : IMediaService
         var media = await _repository.GetMediaByIdAsync(id);
 
         if (media == null)
-            throw new Exception("Media not found exception");
+            throw new NotFoundException("Media not found exception");
 
         return media;
     }

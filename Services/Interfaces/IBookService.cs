@@ -5,7 +5,7 @@ namespace LibraNet.Services.Interfaces;
 
 public interface IBookService
 {
-    Task<Book> GetBookByIdAsync(int id);
+    Task<BookDetailDto> GetBookByIdAsync(int id);
     Task<IEnumerable<BookListDto>> GetBooksAsync();
     Task<BookDto> BookCreateAsync(BookCreateDto book);
     Task<BookUpdateViewDto> BookUpdateAsync(int id, BookUpdateDto book);

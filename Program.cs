@@ -1,4 +1,5 @@
 using LibraNet.Data;
+using LibraNet.Filters;
 using LibraNet.Repository;
 using LibraNet.Repository.Interfaces;
 using LibraNet.Services;
@@ -15,6 +16,10 @@ builder.Services.AddDbContext<LibraNetContext>(options =>
 {
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default"),
     assembly => assembly.MigrationsAssembly(typeof(LibraNetContext).Assembly.FullName));
+});
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ExceptionFilter>();
 });
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddScoped<IBaseRepository, BaseRepository>();

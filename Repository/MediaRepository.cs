@@ -1,4 +1,5 @@
 using LibraNet.Data;
+using LibraNet.Models.Dtos.Book;
 using LibraNet.Models.Dtos.Edition;
 using LibraNet.Models.Dtos.Media;
 using LibraNet.Repository.Interfaces;
@@ -18,7 +19,6 @@ public class MediaRepository : BaseRepository, IMediaRepository
         => await _context.MediaFormats
             .Where(x => x.Id == id)
             .Select(x => new MediaDetailDto(
-                x.Id,
                 x.Description,
                 x.Editions.Select(e => new EditionDto(e.Id, e.Year, e.Status)).ToList()
             ))
