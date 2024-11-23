@@ -1,4 +1,5 @@
 using LibraNet.Services.Interfaces;
+using LibraNet.Models.Dtos.Media;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraNet.Controllers;
@@ -28,5 +29,13 @@ public class MediaController : ControllerBase
         var media = await _service.GetMediaByIdAsync(id);
 
         return Ok(media);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post(MediaCreateDto media)
+    {
+        var mediaCreated = await _service.MediaCreateAsync(media);
+
+        return Created(string.Empty, mediaCreated);
     }
 }

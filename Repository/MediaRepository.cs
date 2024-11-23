@@ -1,5 +1,4 @@
 using LibraNet.Data;
-using LibraNet.Models.Dtos.Book;
 using LibraNet.Models.Dtos.Edition;
 using LibraNet.Models.Dtos.Media;
 using LibraNet.Repository.Interfaces;

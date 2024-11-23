@@ -49,14 +49,14 @@ public class BookService : IBookService
     }
     private List<string> ValidateBookCreate(BookCreateDto book)
     {
-        var messageErrors = new List<string>();
+        var errorMessages = new List<string>();
 
         if (string.IsNullOrWhiteSpace(book.Title))
-            messageErrors.Add("Title invalid");
+            errorMessages.Add("Title invalid");
         if (string.IsNullOrWhiteSpace(book.Subject))
-            messageErrors.Add("Subject invalid");
+            errorMessages.Add("Subject invalid");
 
-        return messageErrors;
+        return errorMessages;
     }
 
     public async Task<BookUpdateViewDto> BookUpdateAsync(int id, BookUpdateDto book)

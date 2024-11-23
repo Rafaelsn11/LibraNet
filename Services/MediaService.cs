@@ -1,5 +1,6 @@
 using LibraNet.Exceptions.ExceptionsBase;
 using LibraNet.Models.Dtos.Media;
+using LibraNet.Models.Entities;
 using LibraNet.Repository.Interfaces;
 using LibraNet.Services.Interfaces;
 
@@ -25,4 +26,32 @@ public class MediaService : IMediaService
 
     public async Task<IEnumerable<MediaListDto>> GetMediaAsync()
         => await _repository.GetMediaAsync();
+
+    public async Task<MediaDto> MediaCreateAsync(MediaCreateDto media)
+    {
+        var errors = ValidateMediaCreate(media);
+
+        if (errors.Count > 0)
+            throw new ErrorOrValidationException(errors);
+
+        var entity = new Media
+        {
+            Description = media.Description
+        };
+
+        _repository.Add(entity);
+        await _repository.SaveChangesAsync();
+
+        return new MediaDto(entity.Id, entity.Description);
+    }
+
+    private List<string> ValidateMediaCreate(MediaCreateDto media)
+    {
+        var errorMessages = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(media.Description))
+            errorMessages.Add("Invalid description");
+
+        return errorMessages;
+    }
 }
