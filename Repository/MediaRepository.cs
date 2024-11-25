@@ -1,6 +1,5 @@
 using LibraNet.Data;
-using LibraNet.Models.Dtos.Edition;
-using LibraNet.Models.Dtos.Media;
+using LibraNet.Models.Entities;
 using LibraNet.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,17 +13,13 @@ public class MediaRepository : BaseRepository, IMediaRepository
         _context = context;
     }
 
-    public async Task<MediaDetailDto> GetMediaByIdAsync(int id)
+    public async Task<Media> GetMediaByIdAsync(int id)
         => await _context.MediaFormats
+            .Include(e => e.Editions)
             .Where(x => x.Id == id)
-            .Select(x => new MediaDetailDto(
-                x.Description,
-                x.Editions.Select(e => new EditionDto(e.Id, e.Year, e.Status)).ToList()
-            ))
             .FirstOrDefaultAsync();
 
-    public async Task<IEnumerable<MediaListDto>> GetMediaAsync()
+    public async Task<IEnumerable<Media>> GetMediaAsync()
         => await _context.MediaFormats
-            .Select(x => new MediaListDto(x.Id, x.Description))
             .ToListAsync();
 }

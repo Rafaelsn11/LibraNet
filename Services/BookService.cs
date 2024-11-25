@@ -1,6 +1,7 @@
 using AutoMapper;
 using LibraNet.Exceptions.ExceptionsBase;
 using LibraNet.Models.Dtos.Book;
+using LibraNet.Models.Dtos.Edition;
 using LibraNet.Models.Entities;
 using LibraNet.Repository.Interfaces;
 using LibraNet.Services.Interfaces;
@@ -23,11 +24,22 @@ public class BookService : IBookService
         if (book == null)
             throw new NotFoundException("Book not found");
 
-        return book;
+        var bookDetail = new BookDetailDto
+        (book.Title,
+        book.Subject,
+        book.Editions.Select(x => new EditionDto(x.Id, x.Year, x.Status)).ToList());
+
+        return bookDetail;
     }
 
     public async Task<IEnumerable<BookListDto>> GetBooksAsync()
-        => await _repository.GetBooksAsync();
+    {
+        var books = await _repository.GetBooksAsync();
+
+        var bookLists = books.Select(x => new BookListDto(x.Id, x.Title));
+
+        return bookLists;
+    }
 
     public async Task<BookDto> BookCreateAsync(BookCreateDto book)
     {

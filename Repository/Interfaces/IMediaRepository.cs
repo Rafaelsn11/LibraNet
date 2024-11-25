@@ -1,9 +1,9 @@
-using LibraNet.Models.Dtos.Media;
+using LibraNet.Models.Entities;
 
 namespace LibraNet.Repository.Interfaces;
 
 public interface IMediaRepository : IBaseRepository
 {
-    Task<IEnumerable<MediaListDto>> GetMediaAsync();
-    Task<MediaDetailDto> GetMediaByIdAsync(int id);
+    Task<IEnumerable<Media>> GetMediaAsync();
+    Task<Media> GetMediaByIdAsync(int id);
 }

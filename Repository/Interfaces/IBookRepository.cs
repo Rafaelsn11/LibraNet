@@ -5,6 +5,6 @@ namespace LibraNet.Repository.Interfaces;
 
 public interface IBookRepository : IBaseRepository
 {
-    Task<IEnumerable<BookListDto>> GetBooksAsync();
-    Task<BookDetailDto> GetBookByIdAsync(int id);
+    Task<IEnumerable<Book>> GetBooksAsync();
+    Task<Book> GetBookByIdAsync(int id);
 }
