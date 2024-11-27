@@ -32,10 +32,20 @@ public class MediaController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(MediaCreateDto media)
+    public async Task<IActionResult> Post([FromBody] MediaCreateDto media)
     {
         var mediaCreated = await _service.MediaCreateAsync(media);
 
         return Created(string.Empty, mediaCreated);
+    }
+
+    [HttpPut]
+    [Route("{id}")]
+    public async Task<IActionResult> Put([FromRoute] int id,
+        [FromBody] MediaUpdateDto media)
+    {
+        var mediaUpdate = await _service.MediaUpdateAsync(id, media);
+
+        return Ok(mediaUpdate);
     }
 }
