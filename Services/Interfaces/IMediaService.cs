@@ -8,4 +8,5 @@ public interface IMediaService
     Task<MediaDetailDto> GetMediaByIdAsync(int id);
     Task<MediaDto> MediaCreateAsync(MediaCreateDto media);
     Task<MediaUpdateViewDto> MediaUpdateAsync(int id, MediaUpdateDto media);
+    Task MediaDeleteAsync(int id);
 }

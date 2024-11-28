@@ -48,4 +48,13 @@ public class MediaController : ControllerBase
 
         return Ok(mediaUpdate);
     }
+
+    [HttpDelete]
+    [Route("{id}")]
+    public async Task<IActionResult> Delete([FromRoute] int id)
+    {
+        await _service.MediaDeleteAsync(id);
+
+        return NoContent();
+    }
 }

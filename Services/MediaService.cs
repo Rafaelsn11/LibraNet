@@ -83,4 +83,15 @@ public class MediaService : IMediaService
 
         return new MediaUpdateViewDto(mediaUpdate.Description);
     }
+
+    public async Task MediaDeleteAsync(int id)
+    {
+        var mediaDB = await _repository.GetMediaByIdAsync(id);
+
+        if (mediaDB == null)
+            throw new NotFoundException("Media not found");
+
+        _repository.Delete(mediaDB);
+        await _repository.SaveChangesAsync();
+    }
 }
