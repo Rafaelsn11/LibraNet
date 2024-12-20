@@ -1,6 +1,7 @@
 using LibraNet.Exceptions.ExceptionsBase;
 using LibraNet.Models.Dtos.Edition;
 using LibraNet.Models.Dtos.User;
+using LibraNet.Models.Entities;
 using LibraNet.Repository.Interfaces;
 using LibraNet.Services.Interfaces;
 
@@ -35,5 +36,46 @@ public class UserService : IUserService
         var userLists = user.Select(x => new UserListDto(x.Id, x.Name, x.IsActive));
 
         return userLists;
+    }
+
+    public async Task<UserDto> UserCreateAsync(UserCreateDto user)
+    {
+        var errors = ValidateUserCreate(user);
+
+        if (errors.Count > 0)
+            throw new ErrorOrValidationException(errors);
+
+        var entity = new User
+        {
+            Name = user.Name,
+            Email = user.Email,
+            BirthDate = user.BirthDate,
+            IsActive = true
+        };
+
+        _repository.Add(entity);
+
+        await _repository.SaveChangesAsync();
+
+        return new UserDto(entity.Id, entity.Name, entity.BirthDate);
+    }
+
+    private List<string> ValidateUserCreate(UserCreateDto user)
+    {
+        var errorMessages = new List<string>();
+
+        var properties = typeof(UserCreateDto).GetProperties();
+
+        foreach (var property in properties)
+        {
+            var value = property.GetValue(user);
+
+            if (value == null || (value is string str && string.IsNullOrWhiteSpace(str)))
+            {
+                errorMessages.Add($"{property.Name} is invalid");
+            }
+        }
+
+        return errorMessages;
     }
 }
