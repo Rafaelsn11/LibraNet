@@ -1,3 +1,4 @@
+using LibraNet.Models.Dtos.Edition;
 using LibraNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -28,5 +29,13 @@ public class EditionController : ControllerBase
         var edition = await _service.GetEditionByIdAsync(id);
 
         return Ok(edition);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post([FromBody] EditionCreateDto edition)
+    {
+        var editionCreated = await _service.EditionCreateAsync(edition);
+
+        return Created(string.Empty, editionCreated);
     }
 }

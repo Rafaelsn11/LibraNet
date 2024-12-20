@@ -6,4 +6,5 @@ public interface IEditionService
 {
     Task<IEnumerable<EditionListDto>> GetEditionsAsync();
     Task<EditionDetailDto> GetEditionByIdAsync(int id);
+    Task<EditionDto> EditionCreateAsync(EditionCreateDto edition);
 }
