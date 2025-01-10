@@ -3,6 +3,7 @@ using LibraNet.Models.Dtos.Edition;
 using LibraNet.Models.Dtos.User;
 using LibraNet.Models.Entities;
 using LibraNet.Repository.Interfaces;
+using LibraNet.Services.Cryptography;
 using LibraNet.Services.Interfaces;
 
 namespace LibraNet.Services;
@@ -10,9 +11,12 @@ namespace LibraNet.Services;
 public class UserService : IUserService
 {
     private readonly IUserRepository _repository;
-    public UserService(IUserRepository repository)
+    private readonly IPasswordEncripter _passwordEncripter;
+    
+    public UserService(IUserRepository repository, IPasswordEncripter passwordEncripter)
     {
         _repository = repository;
+        _passwordEncripter = passwordEncripter;
     }
     public async Task<UserDetailDto> GetUserByIdAsync(Guid id)
     {
@@ -33,7 +37,7 @@ public class UserService : IUserService
     {
         var user = await _repository.GetUsersAsync();
 
-        var userLists = user.Select(x => new UserListDto(x.Id, x.Name, x.IsActive));
+        var userLists = user.Select(x => new UserListDto(x.Name, x.IsActive));
 
         return userLists;
     }
@@ -45,10 +49,15 @@ public class UserService : IUserService
         if (errors.Count > 0)
             throw new ErrorOrValidationException(errors);
 
+        var saltUser = _passwordEncripter.GenerateSalt();
+        var encriptedPassword = _passwordEncripter.Encrypt(user.Password, saltUser!);
+
         var entity = new User
         {
             Name = user.Name,
             Email = user.Email,
+            Password = encriptedPassword,
+            Salt = saltUser,
             BirthDate = user.BirthDate,
             IsActive = true
         };
@@ -57,7 +66,7 @@ public class UserService : IUserService
 
         await _repository.SaveChangesAsync();
 
-        return new UserDto(entity.Id, entity.Name, entity.BirthDate);
+        return new UserDto(entity.Name);
     }
 
     private List<string> ValidateUserCreate(UserCreateDto user)

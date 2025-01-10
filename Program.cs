@@ -3,6 +3,7 @@ using LibraNet.Filters;
 using LibraNet.Repository;
 using LibraNet.Repository.Interfaces;
 using LibraNet.Services;
+using LibraNet.Services.Cryptography;
 using LibraNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,13 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ExceptionFilter>();
 });
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddScoped<IPasswordEncripter>(sp =>
+{
+    var additionalKey = builder.Configuration["Settings:Password:AdditionalKey"];
+    return new PasswordEncripter(additionalKey!);
+});
+
 builder.Services.AddScoped<IBaseRepository, BaseRepository>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
@@ -32,6 +40,7 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
 builder.Services.AddScoped<IEditionService, EditionService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ILoginService, LoginService>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

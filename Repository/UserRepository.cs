@@ -13,7 +13,20 @@ public class UserRepository : BaseRepository, IUserRepository
         _context = context;
     }
 
-    public async Task<User> GetUserByIdAsync(Guid id)
+    public Task<bool> ExistsActiveUserWithEmail(string email)
+        => _context.Users.AnyAsync(x => x.Email.Equals(email) && x.IsActive);
+
+    public async Task<User?> GetByEmailAndPassword(string email, string password)
+        => await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.IsActive && u.Email.Equals(email) && u.Password.Equals(password));
+
+    public async Task<User?> GetUserByEmail(string email)
+        => await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.IsActive && u.Email.Equals(email));
+
+    public async Task<User?> GetUserByIdAsync(Guid id)
         => await _context.Users
             .Include(l => l.Loans)
                 .ThenInclude(b => b.Book)
