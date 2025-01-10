@@ -19,7 +19,7 @@ public class PasswordEncripter : IPasswordEncripter
         return StringBytes(hashBytes);
     }
 
-    public static string GenerateSalt(int size = 16)
+    public string GenerateSalt(int size = 16)
     {
         var randomBytes = new byte[size];
 
