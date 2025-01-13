@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LibraNet.Data.Migrations
 {
     [DbContext(typeof(LibraNetContext))]
-    [Migration("20250110212903_UpdateBirthDateToUseDateOnly")]
-    partial class UpdateBirthDateToUseDateOnly
+    [Migration("20250113020610_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -74,8 +74,8 @@ namespace LibraNet.Data.Migrations
                         .HasColumnType("character(1)")
                         .HasColumnName("status");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
                         .HasColumnName("user_id");
 
                     b.Property<int>("Year")
@@ -114,11 +114,12 @@ namespace LibraNet.Data.Migrations
 
             modelBuilder.Entity("LibraNet.Models.Entities.User", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id")
-                        .HasDefaultValueSql("gen_random_uuid()");
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateOnly>("BirthDate")
                         .HasColumnType("date")
@@ -147,6 +148,12 @@ namespace LibraNet.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("salt");
+
+                    b.Property<Guid>("UserIdentifier")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_identifier")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
                     b.HasKey("Id");
 

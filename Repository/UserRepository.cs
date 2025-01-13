@@ -30,7 +30,7 @@ public class UserRepository : BaseRepository, IUserRepository
         => await _context.Users
             .Include(l => l.Loans)
                 .ThenInclude(b => b.Book)
-            .Where(x => x.Id == id)
+            .Where(x => x.UserIdentifier == id)
             .FirstOrDefaultAsync();
 
     public async Task<IEnumerable<User>> GetUsersAsync()
