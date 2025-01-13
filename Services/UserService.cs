@@ -1,8 +1,10 @@
 using LibraNet.Exceptions.ExceptionsBase;
 using LibraNet.Models.Dtos.Edition;
+using LibraNet.Models.Dtos.Token;
 using LibraNet.Models.Dtos.User;
 using LibraNet.Models.Entities;
 using LibraNet.Repository.Interfaces;
+using LibraNet.Security.Tokens.Interfaces;
 using LibraNet.Services.Cryptography;
 using LibraNet.Services.Interfaces;
 
@@ -12,11 +14,16 @@ public class UserService : IUserService
 {
     private readonly IUserRepository _repository;
     private readonly IPasswordEncripter _passwordEncripter;
+    private readonly IAccessTokenGenerator _acessTokenGenerator;
     
-    public UserService(IUserRepository repository, IPasswordEncripter passwordEncripter)
+    public UserService(
+        IUserRepository repository, 
+        IPasswordEncripter passwordEncripter,
+        IAccessTokenGenerator acessTokenGenerator)
     {
         _repository = repository;
         _passwordEncripter = passwordEncripter;
+        _acessTokenGenerator = acessTokenGenerator;
     }
     public async Task<UserDetailDto> GetUserByIdAsync(Guid id)
     {
@@ -66,7 +73,12 @@ public class UserService : IUserService
 
         await _repository.SaveChangesAsync();
 
-        return new UserDto(entity.Name);
+        var tokens = new TokenDto(_acessTokenGenerator.Generate(entity.UserIdentifier));
+        return new UserDto
+        (
+            entity.Name,
+            tokens
+        );
     }
 
     private List<string> ValidateUserCreate(UserCreateDto user)

@@ -2,10 +2,11 @@ using LibraNet.Data;
 using LibraNet.Filters;
 using LibraNet.Repository;
 using LibraNet.Repository.Interfaces;
+using LibraNet.Security.Tokens.Access.Generator;
+using LibraNet.Security.Tokens.Interfaces;
 using LibraNet.Services;
 using LibraNet.Services.Cryptography;
 using LibraNet.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,14 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<ExceptionFilter>();
 });
 builder.Services.AddAutoMapper(typeof(Program));
+
+builder.Services.AddScoped<IAccessTokenGenerator>(option =>
+{
+    var expirationTimeMinutes = uint.Parse(builder.Configuration["Settings:Jwt:ExpirationTimeMinutes"]!);
+    var signingKey = builder.Configuration["Settings:Jwt:SigningKey"];
+
+    return new JwtTokenGenerator(expirationTimeMinutes, signingKey!);
+});
 
 builder.Services.AddScoped<IPasswordEncripter>(sp =>
 {
