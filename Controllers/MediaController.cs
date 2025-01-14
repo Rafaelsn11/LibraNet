@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraNet.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class MediaController : ControllerBase
+public class MediaController : LibraNetBaseController
 {
     private readonly IMediaService _service;
     public MediaController(IMediaService service)

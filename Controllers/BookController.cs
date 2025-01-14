@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraNet.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class BookController : ControllerBase
+public class BookController : LibraNetBaseController
 {
     private readonly IBookService _service;
     public BookController(IBookService service)

@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraNet.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class EditionController : ControllerBase
+public class EditionController : LibraNetBaseController
 {
     private readonly IEditionService _service;
     public EditionController(IEditionService service)

@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraNet.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class LoginController : ControllerBase
+public class LoginController : LibraNetBaseController
 {
     private readonly ILoginService _service;
     public LoginController(ILoginService service)

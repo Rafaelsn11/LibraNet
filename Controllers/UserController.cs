@@ -4,9 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraNet.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class UserController : ControllerBase
+public class UserController : LibraNetBaseController
 {
     private readonly IUserService _service;
     public UserController(IUserService service)
