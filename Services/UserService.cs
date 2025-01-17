@@ -7,6 +7,7 @@ using LibraNet.Repository.Interfaces;
 using LibraNet.Security.Tokens.Interfaces;
 using LibraNet.Services.Cryptography;
 using LibraNet.Services.Interfaces;
+using LibraNet.Services.LoggedUser;
 
 namespace LibraNet.Services;
 
@@ -15,16 +16,30 @@ public class UserService : IUserService
     private readonly IUserRepository _repository;
     private readonly IPasswordEncripter _passwordEncripter;
     private readonly IAccessTokenGenerator _acessTokenGenerator;
+    private readonly ILoggedUser _loggedUser;
     
     public UserService(
         IUserRepository repository, 
         IPasswordEncripter passwordEncripter,
-        IAccessTokenGenerator acessTokenGenerator)
+        IAccessTokenGenerator acessTokenGenerator,
+        ILoggedUser loggedUser)
     {
         _repository = repository;
         _passwordEncripter = passwordEncripter;
         _acessTokenGenerator = acessTokenGenerator;
+        _loggedUser = loggedUser;
     }
+
+    public async Task<UserProfileDto> GetProfileAsync()
+    {
+        var user = await _loggedUser.User();
+
+        return new UserProfileDto(
+            user.Name,
+            user.Email
+        );
+    }
+
     public async Task<UserDetailDto> GetUserByIdAsync(Guid id)
     {
         var user = await _repository.GetUserByIdAsync(id);

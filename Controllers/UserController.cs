@@ -1,3 +1,4 @@
+using LibraNet.Attributes;
 using LibraNet.Models.Dtos.User;
 using LibraNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -27,6 +28,16 @@ public class UserController : LibraNetBaseController
         var user = await _service.GetUserByIdAsync(id);
 
         return Ok(user);
+    }
+
+    [HttpGet]
+    [Route("/profile")]
+    [AuthenticatedUser]
+    public async Task<IActionResult> GetUserProfile()
+    {
+        var profile = await _service.GetProfileAsync();
+
+        return Ok(profile);
     }
 
     [HttpPost]

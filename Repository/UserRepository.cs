@@ -16,6 +16,10 @@ public class UserRepository : BaseRepository, IUserRepository
     public Task<bool> ExistsActiveUserWithEmail(string email)
         => _context.Users.AnyAsync(x => x.Email.Equals(email) && x.IsActive);
 
+    public async Task<bool> ExistsActiveUserWithIdentifier(Guid userIdentifier)
+        => await _context.Users
+            .AnyAsync(user => user.UserIdentifier.Equals(userIdentifier) && user.IsActive);
+
     public async Task<User?> GetByEmailAndPassword(string email, string password)
         => await _context.Users
             .AsNoTracking()
@@ -36,4 +40,9 @@ public class UserRepository : BaseRepository, IUserRepository
     public async Task<IEnumerable<User>> GetUsersAsync()
         => await _context.Users
             .ToListAsync();
+    
+    public async Task<User> GetActiveUserByIdentifierAsync(Guid userIdentifier)
+        => await _context.Users
+            .AsNoTracking()
+            .FirstAsync(user => user.IsActive && user.UserIdentifier == userIdentifier);
 }
