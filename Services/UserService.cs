@@ -112,6 +112,11 @@ public class UserService : IUserService
             }
         }
 
+        if(user.Password.Length < 6)
+        {
+            errorMessages.Add("Password must be at least 6 characters");
+        }
+        
         return errorMessages;
     }
 }
