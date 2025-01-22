@@ -5,15 +5,18 @@ using LibraNet.Models.Dtos.Media;
 using LibraNet.Models.Entities;
 using LibraNet.Repository.Interfaces;
 using LibraNet.Services.Interfaces;
+using LibraNet.Services.LoggedUser;
 
 namespace LibraNet.Services;
 
 public class EditionService : IEditionService
 {
     private readonly IEditionRepository _repository;
-    public EditionService(IEditionRepository repository)
+    private readonly ILoggedUser _loggedUser;
+    public EditionService(IEditionRepository repository, ILoggedUser loggedUser)
     {
         _repository = repository;
+        _loggedUser = loggedUser;
     }
     public async Task<IEnumerable<EditionListDto>> GetEditionsAsync()
     {
@@ -52,8 +55,8 @@ public class EditionService : IEditionService
         var entity = new Edition
         {
             Year = edition.Year,
-            Status = edition.Status,
-            LastLoanDate = null,
+            Status = 'L',
+            LastLoanDate = DateTime.MinValue,
             BookId = edition.BookId,
             MediaId = edition.MediaId,
             UserId = edition.UserId
@@ -87,5 +90,46 @@ public class EditionService : IEditionService
         }
 
         return errorMessages;
+    }
+
+    public async Task EditionLoanAsync(int id, DateTime date)
+    {
+        var user = await _loggedUser.User();
+        var userId = user.Id;
+
+        var edition = await _repository.GetEditionByIdAsync(id);
+
+        if (edition == null)
+            throw new NotFoundException("Edition not found");
+        
+        if(edition.Status == 'L')
+            throw new ResourceConflictException("Edition is already loaned");
+
+        edition.Status = 'L';
+        edition.LastLoanDate = date;
+        edition.UserId = userId;
+
+        _repository.Update(edition);
+        await _repository.SaveChangesAsync();
+    }
+
+    public async Task EditionReturnAsync(int id)
+    {
+        var user = await _loggedUser.User();
+        var userId = user.Id;
+
+        var edition = await _repository.GetEditionByIdAsync(id);
+
+        if (edition == null)
+            throw new NotFoundException("Edition not found");
+        
+        if(edition.Status == 'D')
+            throw new ResourceConflictException("Edition is already loaned");
+        
+        edition.Status = 'D';
+        edition.UserId = userId;
+
+        _repository.Update(edition);
+        await _repository.SaveChangesAsync();
     }
 }

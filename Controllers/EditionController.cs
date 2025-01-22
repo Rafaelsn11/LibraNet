@@ -1,3 +1,4 @@
+using LibraNet.Attributes;
 using LibraNet.Models.Dtos.Edition;
 using LibraNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -35,5 +36,25 @@ public class EditionController : LibraNetBaseController
         var editionCreated = await _service.EditionCreateAsync(edition);
 
         return Created(string.Empty, editionCreated);
+    }
+
+    [HttpPut]
+    [Route("loan/{editionId}")]
+    [AuthenticatedUser]
+    public async Task<IActionResult> Loan([FromRoute] int editionId)
+    {
+        await _service.EditionLoanAsync(editionId, DateTime.UtcNow);
+
+        return NoContent();
+    }
+
+    [HttpPut]
+    [Route("return/{editionId}")]
+    [AuthenticatedUser]
+    public async Task<IActionResult> Return([FromRoute] int editionId)
+    {
+        await _service.EditionReturnAsync(editionId);
+
+        return NoContent();
     }
 }
