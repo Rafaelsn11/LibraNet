@@ -55,11 +55,10 @@ public class EditionService : IEditionService
         var entity = new Edition
         {
             Year = edition.Year,
-            Status = 'L',
+            Status = 'D',
             LastLoanDate = DateTime.MinValue,
             BookId = edition.BookId,
-            MediaId = edition.MediaId,
-            UserId = edition.UserId
+            MediaId = edition.MediaId
         };
 
         _repository.Add(entity);
@@ -124,7 +123,7 @@ public class EditionService : IEditionService
             throw new NotFoundException("Edition not found");
         
         if(edition.Status == 'D')
-            throw new ResourceConflictException("Edition is already loaned");
+            throw new ResourceConflictException("Edition has already been returned");
         
         edition.Status = 'D';
         edition.UserId = userId;
