@@ -9,6 +9,6 @@ public class Edition : EntityBase
     public Book Book { get; set; }
     public int MediaId { get; set; }
     public Media Media { get; set; }
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
     public User User { get; set; }
 }

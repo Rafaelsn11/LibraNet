@@ -3,6 +3,7 @@ using System;
 using LibraNet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LibraNet.Data.Migrations
 {
     [DbContext(typeof(LibraNetContext))]
-    partial class LibraNetContextModelSnapshot : ModelSnapshot
+    [Migration("20250123021122_IsRequiredUserIdFalse")]
+    partial class IsRequiredUserIdFalse
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
