@@ -9,4 +9,5 @@ public interface IUserService
     Task<UserDto> UserCreateAsync(UserCreateDto user);
     Task<UserProfileDto> GetProfileAsync();
     Task UserUpdateAsync(UserUpdateDto userUpdate);
+    Task UserChangePasswordAsync(UserChangePassword userChangePassword);
 }

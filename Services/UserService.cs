@@ -159,5 +159,39 @@ public class UserService : IUserService
             throw new ErrorOrValidationException(errorMessages);
     }
 
-    
+    public async Task UserChangePasswordAsync(UserChangePassword userChangePassword)
+    {
+        var loggedUser = await _loggedUser.User();
+
+        ValidateChangePassword(userChangePassword, loggedUser);
+
+        var user = await _repository.GetUserByIdAsync(loggedUser.Id);
+
+        user.Password = _passwordEncripter.Encrypt(userChangePassword.NewPassword, user.Salt);
+
+        _repository.Update(user);
+        await _repository.SaveChangesAsync();
+    }
+
+    private void ValidateChangePassword(UserChangePassword userChangePassword, User user)
+    {
+        var errorMessages = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(userChangePassword.Password))
+            errorMessages.Add("Name is invalid");
+        
+        if(string.IsNullOrWhiteSpace(userChangePassword.NewPassword))
+            errorMessages.Add("Email is invalid");
+
+        if(userChangePassword.NewPassword.Length < 6)
+            errorMessages.Add("Password must be at least 6 characters");
+        
+        var currentPasswordEncripter = _passwordEncripter.Encrypt(userChangePassword.Password, user.Salt);
+
+        if (!currentPasswordEncripter.Equals(user.Password))
+            errorMessages.Add("Password different current password");
+        
+        if (errorMessages.Count > 0)
+            throw new ErrorOrValidationException(errorMessages);
+    }
 }

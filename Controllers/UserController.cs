@@ -62,4 +62,15 @@ public class UserController : LibraNetBaseController
 
         return NoContent();
     }
+
+    [HttpPut("change-password")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorsJson),StatusCodes.Status400BadRequest)]
+    [AuthenticatedUser]
+    public async Task<IActionResult> ChangePassword(UserChangePassword userChangePassword)
+    {
+        await _service.UserChangePasswordAsync(userChangePassword);
+        
+        return NoContent();
+    }
 }
