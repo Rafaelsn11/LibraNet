@@ -66,10 +66,7 @@ public class UserService : IUserService
 
     public async Task<UserDto> UserCreateAsync(UserCreateDto user)
     {
-        var errors = ValidateUserCreate(user);
-
-        if (errors.Count > 0)
-            throw new ErrorOrValidationException(errors);
+        await ValidateUserCreate(user);
 
         var saltUser = _passwordEncripter.GenerateSalt();
         var encriptedPassword = _passwordEncripter.Encrypt(user.Password, saltUser!);
@@ -96,7 +93,7 @@ public class UserService : IUserService
         );
     }
 
-    private List<string> ValidateUserCreate(UserCreateDto user)
+    private async Task ValidateUserCreate(UserCreateDto user)
     {
         var errorMessages = new List<string>();
 
@@ -112,11 +109,55 @@ public class UserService : IUserService
             }
         }
 
+        var emailExists = await _repository.ExistsActiveUserWithEmail(user.Email);
+        if (emailExists)
+            errorMessages.Add("Email already Registred");
+
         if(user.Password.Length < 6)
         {
             errorMessages.Add("Password must be at least 6 characters");
         }
         
-        return errorMessages;
+        if (errorMessages.Count > 0)
+            throw new ErrorOrValidationException(errorMessages);
     }
+
+    public async Task UserUpdateAsync(UserUpdateDto userUpdate)
+    {
+        var loggedUser = await _loggedUser.User();
+
+        await ValidateUserUpdate(userUpdate, loggedUser.Email);
+
+        var user = await _repository.GetUserByIdAsync(loggedUser.Id);
+
+        user.Name = userUpdate.Name;
+        user.Email = userUpdate.Email;
+
+        _repository.Update(user);
+        await _repository.SaveChangesAsync();
+    }
+
+    private async Task ValidateUserUpdate(UserUpdateDto user, string currentEmail)
+    {
+        var errorMessages = new List<string>();
+
+        if (string.IsNullOrWhiteSpace(user.Name))
+            errorMessages.Add("Name is invalid");
+        
+        if(string.IsNullOrWhiteSpace(user.Email))
+            errorMessages.Add("Email is invalid");
+
+
+        if (!currentEmail.Equals(user.Email))
+        {
+            var userExist = await _repository.ExistsActiveUserWithEmail(user.Email);
+            if(userExist)
+                errorMessages.Add("Email already Registred");
+        }
+
+        if (errorMessages.Count > 0)
+            throw new ErrorOrValidationException(errorMessages);
+    }
+
+    
 }

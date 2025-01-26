@@ -8,4 +8,5 @@ public interface IUserService
     Task<UserDetailDto> GetUserByIdAsync(Guid id);
     Task<UserDto> UserCreateAsync(UserCreateDto user);
     Task<UserProfileDto> GetProfileAsync();
+    Task UserUpdateAsync(UserUpdateDto userUpdate);
 }

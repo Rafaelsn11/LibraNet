@@ -1,4 +1,5 @@
 using LibraNet.Attributes;
+using LibraNet.Exceptions.ResponseError;
 using LibraNet.Models.Dtos.User;
 using LibraNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ public class UserController : LibraNetBaseController
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<UserListDto>), StatusCodes.Status200OK)] 
     public async Task<IActionResult> Get()
     {
         var users = await _service.GetUsersAsync();
@@ -23,6 +25,7 @@ public class UserController : LibraNetBaseController
 
     [HttpGet]
     [Route("{id}")]
+    [ProducesResponseType(typeof(UserDetailDto), StatusCodes.Status200OK)]   
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
         var user = await _service.GetUserByIdAsync(id);
@@ -30,8 +33,8 @@ public class UserController : LibraNetBaseController
         return Ok(user);
     }
 
-    [HttpGet]
-    [Route("/profile")]
+    [HttpGet("/profile")]
+    [ProducesResponseType(typeof(UserProfileDto), StatusCodes.Status200OK)]   
     [AuthenticatedUser]
     public async Task<IActionResult> GetUserProfile()
     {
@@ -41,10 +44,22 @@ public class UserController : LibraNetBaseController
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
     public async Task<IActionResult> Post([FromBody] UserCreateDto user)
     {
         var userCreated = await _service.UserCreateAsync(user);
 
         return Created(string.Empty, userCreated);
+    }
+
+    [HttpPut]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorsJson),StatusCodes.Status400BadRequest)]
+    [AuthenticatedUser]
+    public async Task<IActionResult> Update([FromBody] UserUpdateDto userUpdate)
+    {
+        await _service.UserUpdateAsync(userUpdate);
+
+        return NoContent();
     }
 }

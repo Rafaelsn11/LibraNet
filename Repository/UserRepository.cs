@@ -45,4 +45,11 @@ public class UserRepository : BaseRepository, IUserRepository
         => await _context.Users
             .AsNoTracking()
             .FirstAsync(user => user.IsActive && user.UserIdentifier == userIdentifier);
+
+    public async Task<User> GetUserByIdAsync(int id)
+        => await _context.Users
+            .Include(l => l.Loans)
+                .ThenInclude(b => b.Book)
+            .Where(x => x.Id == id)
+            .FirstOrDefaultAsync();
 }

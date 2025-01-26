@@ -6,6 +6,7 @@ public interface IUserRepository : IBaseRepository
 {
     Task<IEnumerable<User>> GetUsersAsync();
     Task<User?> GetUserByIdAsync(Guid id);
+    Task<User> GetUserByIdAsync(int id);
     Task<User?> GetUserByEmail(string email);
     Task<bool> ExistsActiveUserWithEmail(string email);
     Task<bool> ExistsActiveUserWithIdentifier(Guid userIdentifier);
