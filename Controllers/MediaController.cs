@@ -1,6 +1,7 @@
 using LibraNet.Services.Interfaces;
 using LibraNet.Models.Dtos.Media;
 using Microsoft.AspNetCore.Mvc;
+using LibraNet.Exceptions.ResponseError;
 
 namespace LibraNet.Controllers;
 
@@ -13,6 +14,7 @@ public class MediaController : LibraNetBaseController
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<MediaListDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get()
     {
         var media = await _service.GetMediaAsync();
@@ -22,6 +24,8 @@ public class MediaController : LibraNetBaseController
 
     [HttpGet]
     [Route("{id}")]
+    [ProducesResponseType(typeof(MediaListDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var media = await _service.GetMediaByIdAsync(id);
@@ -30,6 +34,8 @@ public class MediaController : LibraNetBaseController
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(MediaDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Post([FromBody] MediaCreateDto media)
     {
         var mediaCreated = await _service.MediaCreateAsync(media);
@@ -39,6 +45,8 @@ public class MediaController : LibraNetBaseController
 
     [HttpPut]
     [Route("{id}")]
+    [ProducesResponseType(typeof(MediaUpdateViewDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Put([FromRoute] int id,
         [FromBody] MediaUpdateDto media)
     {
@@ -49,6 +57,8 @@ public class MediaController : LibraNetBaseController
 
     [HttpDelete]
     [Route("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
         await _service.MediaDeleteAsync(id);

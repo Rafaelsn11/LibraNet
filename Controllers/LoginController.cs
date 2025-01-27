@@ -1,3 +1,4 @@
+using LibraNet.Exceptions.ResponseError;
 using LibraNet.Models.Dtos.User;
 using LibraNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,8 @@ public class LoginController : LibraNetBaseController
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> Login([FromBody] UserLoginDto userLogin)
     {
         var user = await _service.ExecuteLogin(userLogin);

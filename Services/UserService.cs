@@ -194,4 +194,16 @@ public class UserService : IUserService
         if (errorMessages.Count > 0)
             throw new ErrorOrValidationException(errorMessages);
     }
+
+    public async Task UserAccountOff()
+    {
+        var loggedUser = await _loggedUser.User();
+
+        var user = await _repository.GetUserByIdAsync(loggedUser.Id);
+
+        user.IsActive = false;
+        _repository.Update(user);
+
+        await _repository.SaveChangesAsync();
+    }
 }
