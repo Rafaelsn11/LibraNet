@@ -10,4 +10,5 @@ public class User : EntityBase
     public DateOnly BirthDate { get; set; }
     public bool IsActive { get; set; }
     public List<Edition> Loans { get; set; }
+    public List<UserRole> UserRoles { get; set; } = [];
 }
