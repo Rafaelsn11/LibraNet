@@ -13,18 +13,21 @@ namespace LibraNet.Services;
 
 public class UserService : IUserService
 {
-    private readonly IUserRepository _repository;
+    private readonly IUserRepository _userRepository;
+    private readonly IRoleRepository _roleRepository;
     private readonly IPasswordEncripter _passwordEncripter;
     private readonly IAccessTokenGenerator _acessTokenGenerator;
     private readonly ILoggedUser _loggedUser;
     
     public UserService(
-        IUserRepository repository, 
+        IUserRepository userRepository,
+        IRoleRepository roleRepository,
         IPasswordEncripter passwordEncripter,
         IAccessTokenGenerator acessTokenGenerator,
         ILoggedUser loggedUser)
     {
-        _repository = repository;
+        _userRepository = userRepository;
+        _roleRepository = roleRepository;
         _passwordEncripter = passwordEncripter;
         _acessTokenGenerator = acessTokenGenerator;
         _loggedUser = loggedUser;
@@ -42,7 +45,7 @@ public class UserService : IUserService
 
     public async Task<UserDetailDto> GetUserByIdAsync(Guid id)
     {
-        var user = await _repository.GetUserByIdAsync(id);
+        var user = await _userRepository.GetUserByIdAsync(id);
 
         if (user == null)
             throw new NotFoundException("User not found");
@@ -57,7 +60,7 @@ public class UserService : IUserService
 
     public async Task<IEnumerable<UserListDto>> GetUsersAsync()
     {
-        var user = await _repository.GetUsersAsync();
+        var user = await _userRepository.GetUsersAsync();
 
         var userLists = user.Select(x => new UserListDto(x.Name, x.IsActive));
 
@@ -81,11 +84,22 @@ public class UserService : IUserService
             IsActive = true
         };
 
-        _repository.Add(entity);
+        var role = await _roleRepository.GetRoleByNameAsync("User");
+        if (role != null)
+        {
+            entity.UserRoles.Add(new UserRole
+            {
+                UserId = entity.Id,
+                RoleId = role.Id
+            });
+            
+        }
 
-        await _repository.SaveChangesAsync();
+        _userRepository.Add(entity);
 
-        var tokens = new TokenDto(_acessTokenGenerator.Generate(entity.UserIdentifier));
+        await _userRepository.SaveChangesAsync();
+
+        var tokens = new TokenDto(await _acessTokenGenerator.Generate(entity.UserIdentifier));
         return new UserDto
         (
             entity.Name,
@@ -109,7 +123,7 @@ public class UserService : IUserService
             }
         }
 
-        var emailExists = await _repository.ExistsActiveUserWithEmail(user.Email);
+        var emailExists = await _userRepository.ExistsActiveUserWithEmail(user.Email);
         if (emailExists)
             errorMessages.Add("Email already Registred");
 
@@ -128,13 +142,13 @@ public class UserService : IUserService
 
         await ValidateUserUpdate(userUpdate, loggedUser.Email);
 
-        var user = await _repository.GetUserByIdAsync(loggedUser.Id);
+        var user = await _userRepository.GetUserByIdAsync(loggedUser.Id);
 
         user.Name = userUpdate.Name;
         user.Email = userUpdate.Email;
 
-        _repository.Update(user);
-        await _repository.SaveChangesAsync();
+        _userRepository.Update(user);
+        await _userRepository.SaveChangesAsync();
     }
 
     private async Task ValidateUserUpdate(UserUpdateDto user, string currentEmail)
@@ -150,7 +164,7 @@ public class UserService : IUserService
 
         if (!currentEmail.Equals(user.Email))
         {
-            var userExist = await _repository.ExistsActiveUserWithEmail(user.Email);
+            var userExist = await _userRepository.ExistsActiveUserWithEmail(user.Email);
             if(userExist)
                 errorMessages.Add("Email already Registred");
         }
@@ -165,12 +179,12 @@ public class UserService : IUserService
 
         ValidateChangePassword(userChangePassword, loggedUser);
 
-        var user = await _repository.GetUserByIdAsync(loggedUser.Id);
+        var user = await _userRepository.GetUserByIdAsync(loggedUser.Id);
 
         user.Password = _passwordEncripter.Encrypt(userChangePassword.NewPassword, user.Salt);
 
-        _repository.Update(user);
-        await _repository.SaveChangesAsync();
+        _userRepository.Update(user);
+        await _userRepository.SaveChangesAsync();
     }
 
     private void ValidateChangePassword(UserChangePassword userChangePassword, User user)
@@ -199,11 +213,11 @@ public class UserService : IUserService
     {
         var loggedUser = await _loggedUser.User();
 
-        var user = await _repository.GetUserByIdAsync(loggedUser.Id);
+        var user = await _userRepository.GetUserByIdAsync(loggedUser.Id);
 
         user.IsActive = false;
-        _repository.Update(user);
+        _userRepository.Update(user);
 
-        await _repository.SaveChangesAsync();
+        await _userRepository.SaveChangesAsync();
     }
 }

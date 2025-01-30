@@ -35,7 +35,7 @@ public class LoginService : ILoginService
         if(user == null)
             throw new InvalidLoginException();
 
-        var tokens = new TokenDto(_acessTokenGenerator.Generate(user.UserIdentifier));
+        var tokens = new TokenDto(await _acessTokenGenerator.Generate(user.UserIdentifier));
         return new UserDto
         (
             user.Name,

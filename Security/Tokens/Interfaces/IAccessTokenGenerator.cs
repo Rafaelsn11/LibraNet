@@ -2,5 +2,5 @@ namespace LibraNet.Security.Tokens.Interfaces;
 
 public interface IAccessTokenGenerator
 {
-    public string Generate(Guid userIdentifier);
+    public Task<string> Generate(Guid userIdentifier);
 }

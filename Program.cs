@@ -34,7 +34,9 @@ builder.Services.AddScoped<IAccessTokenGenerator>(option =>
     var expirationTimeMinutes = uint.Parse(builder.Configuration["Settings:Jwt:ExpirationTimeMinutes"]!);
     var signingKey = builder.Configuration["Settings:Jwt:SigningKey"];
 
-    return new JwtTokenGenerator(expirationTimeMinutes, signingKey!);
+    var userRepository = option.GetRequiredService<IUserRepository>();
+    
+    return new JwtTokenGenerator(expirationTimeMinutes, signingKey!, userRepository);
 });
 builder.Services.AddScoped<IAccessTokenValidator>(option =>
 {
@@ -53,6 +55,7 @@ builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 builder.Services.AddScoped<IEditionRepository, EditionRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
 builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IMediaService, MediaService>();
