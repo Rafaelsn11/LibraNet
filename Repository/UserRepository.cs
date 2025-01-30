@@ -13,8 +13,8 @@ public class UserRepository : BaseRepository, IUserRepository
         _context = context;
     }
 
-    public Task<bool> ExistsActiveUserWithEmail(string email)
-        => _context.Users.AnyAsync(x => x.Email.Equals(email) && x.IsActive);
+    public async Task<bool> ExistsActiveUserWithEmail(string email)
+        => await _context.Users.AnyAsync(x => x.Email.Equals(email) && x.IsActive);
 
     public async Task<bool> ExistsActiveUserWithIdentifier(Guid userIdentifier)
         => await _context.Users
@@ -52,4 +52,10 @@ public class UserRepository : BaseRepository, IUserRepository
                 .ThenInclude(b => b.Book)
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync();
+
+    public async Task<IEnumerable<string>> GetUserRolesByIdentifier(string identifier)
+        => await _context.UserRoles
+            .Where(ur => ur.User.UserIdentifier.ToString() == identifier)
+            .Select(ur => ur.Role.RoleName)
+            .ToListAsync();
 }
