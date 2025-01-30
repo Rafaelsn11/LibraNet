@@ -2,9 +2,11 @@ using LibraNet.Services.Interfaces;
 using LibraNet.Models.Dtos.Media;
 using Microsoft.AspNetCore.Mvc;
 using LibraNet.Exceptions.ResponseError;
+using LibraNet.Attributes;
 
 namespace LibraNet.Controllers;
 
+[AdminOnly]
 public class MediaController : LibraNetBaseController
 {
     private readonly IMediaService _service;

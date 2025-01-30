@@ -6,7 +6,8 @@ namespace LibraNet.Attributes;
 
 public class AuthenticatedUserAttribute : TypeFilterAttribute
 {
-    public AuthenticatedUserAttribute() : base(typeof(AuthenticatedUserFilter))
+    public AuthenticatedUserAttribute() : base(typeof(RoleBasedAuthorizationFilter))
     {
+        Arguments = new object[] { new string[] { "Admin", "User" } };
     }
 }

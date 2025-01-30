@@ -16,6 +16,7 @@ public class UserController : LibraNetBaseController
 
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<UserListDto>), StatusCodes.Status200OK)]
+    [AdminOnly]
     public async Task<IActionResult> Get()
     {
         var users = await _service.GetUsersAsync();
@@ -26,7 +27,8 @@ public class UserController : LibraNetBaseController
     [HttpGet]
     [Route("{id}")]
     [ProducesResponseType(typeof(UserDetailDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]    
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
+    [AdminOnly]    
     public async Task<IActionResult> Get([FromRoute] Guid id)
     {
         var user = await _service.GetUserByIdAsync(id);

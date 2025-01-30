@@ -16,6 +16,7 @@ public class EditionController : LibraNetBaseController
 
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<EditionListDto>), StatusCodes.Status200OK)]
+    [AdminOnly]
     public async Task<IActionResult> Get()
     {
         var editions = await _service.GetEditionsAsync();
@@ -27,6 +28,7 @@ public class EditionController : LibraNetBaseController
     [Route("{id}")]
     [ProducesResponseType(typeof(EditionDetailDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
+    [AdminOnly]
     public async Task<IActionResult> Get(int id)
     {
         var edition = await _service.GetEditionByIdAsync(id);
@@ -37,6 +39,7 @@ public class EditionController : LibraNetBaseController
     [HttpPost]
     [ProducesResponseType(typeof(EditionDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
+    [AdminOnly]
     public async Task<IActionResult> Post([FromBody] EditionCreateDto edition)
     {
         var editionCreated = await _service.EditionCreateAsync(edition);

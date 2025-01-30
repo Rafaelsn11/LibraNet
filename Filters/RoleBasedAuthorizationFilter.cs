@@ -8,19 +8,22 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace LibraNet.Filters;
 
-public class AuthenticatedUserFilter : IAsyncAuthorizationFilter
+public class RoleBasedAuthorizationFilter : IAsyncAuthorizationFilter
 {
     private readonly IAccessTokenValidator _accessTokenValidator;
     private readonly IUserRepository _repository;
+    private readonly string[] _allowedRoles;
 
-    public AuthenticatedUserFilter(
+    public RoleBasedAuthorizationFilter(
         IAccessTokenValidator accessTokenValidator,
-        IUserRepository repository) 
+        IUserRepository repository,
+        string[] allowedRoles) 
     {
         _accessTokenValidator = accessTokenValidator;
         _repository = repository;
+        _allowedRoles = allowedRoles;
     }
-    
+
     public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
     {
         try
@@ -31,8 +34,13 @@ public class AuthenticatedUserFilter : IAsyncAuthorizationFilter
 
             var exist = await _repository.ExistsActiveUserWithIdentifier(userIdentifier);
 
-            if(exist == false)
+            if (!exist)
                 throw new LibraNetException("User without permission access");
+
+            var roles = await _repository.GetUserRolesByIdentifier(userIdentifier.ToString());
+
+            if (!_allowedRoles.Any(role => roles.Contains(role)))
+                throw new LibraNetException("User is not authorized for this route");
         }
         catch (SecurityTokenExpiredException)
         {

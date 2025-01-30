@@ -1,3 +1,4 @@
+using LibraNet.Attributes;
 using LibraNet.Exceptions.ResponseError;
 using LibraNet.Models.Dtos.Book;
 using LibraNet.Services.Interfaces;
@@ -5,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LibraNet.Controllers;
 
+[AdminOnly]
 public class BookController : LibraNetBaseController
 {
     private readonly IBookService _service;
