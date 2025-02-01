@@ -104,6 +104,15 @@ builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<LibraNetContext>();
+    var passwordEncripter = scope.ServiceProvider.GetRequiredService<IPasswordEncripter>();
+    var configuration = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+
+    await DbInitializer.InitializeAsync(context, passwordEncripter, configuration);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
