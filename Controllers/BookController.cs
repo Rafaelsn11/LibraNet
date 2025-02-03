@@ -37,6 +37,7 @@ public class BookController : LibraNetBaseController
     [HttpPost]
     [ProducesResponseType(typeof(BookDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Post([FromBody] BookCreateDto book)
     {
         var bookCreated = await _service.BookCreateAsync(book);

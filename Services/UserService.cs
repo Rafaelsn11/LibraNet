@@ -1,3 +1,4 @@
+using System.Net.Mail;
 using LibraNet.Exceptions.ExceptionsBase;
 using LibraNet.Models.Dtos.Edition;
 using LibraNet.Models.Dtos.Token;
@@ -122,6 +123,9 @@ public class UserService : IUserService
                 errorMessages.Add($"{property.Name} is invalid");
             }
         }
+        
+        if (!ValidateEmailAddress(user.Email))
+            errorMessages.Add("Email address is invalid");
 
         var emailExists = await _userRepository.ExistsActiveUserWithEmail(user.Email);
         if (emailExists)
@@ -134,6 +138,20 @@ public class UserService : IUserService
         
         if (errorMessages.Count > 0)
             throw new ErrorOrValidationException(errorMessages);
+    }
+
+    private bool ValidateEmailAddress(string email)
+    {
+        try
+        {
+            var address = new MailAddress(email);
+
+            return address.Address.Equals(email);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     public async Task UserUpdateAsync(UserUpdateDto userUpdate)
@@ -161,6 +179,8 @@ public class UserService : IUserService
         if(string.IsNullOrWhiteSpace(user.Email))
             errorMessages.Add("Email is invalid");
 
+        if (!ValidateEmailAddress(user.Email))
+            errorMessages.Add("Email address is invalid");
 
         if (!currentEmail.Equals(user.Email))
         {

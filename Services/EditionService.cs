@@ -47,10 +47,7 @@ public class EditionService : IEditionService
 
     public async Task<EditionDto> EditionCreateAsync(EditionCreateDto edition)
     {
-        var errors = ValidateEdition(edition);
-
-        if (errors.Count > 0)
-            throw new ErrorOrValidationException(errors);
+        await ValidateEdition(edition);
 
         var entity = new Edition
         {
@@ -68,9 +65,9 @@ public class EditionService : IEditionService
         return new EditionDto(entity.Id, entity.Year, entity.Status);
     }
 
-    private List<string> ValidateEdition(EditionCreateDto edition)
+    private async Task ValidateEdition(EditionCreateDto edition)
     {
-        var errorMessages = new List<string>();
+        var errors = new List<string>();
 
         var properties = typeof(EditionCreateDto).GetProperties();
 
@@ -80,15 +77,22 @@ public class EditionService : IEditionService
 
             if (value == null || (value is string str && string.IsNullOrWhiteSpace(str)))
             {
-                errorMessages.Add($"{property.Name} is invalid");
+                errors.Add($"{property.Name} is invalid");
             }
             else if (value is int number && number <= 0)
             {
-                errorMessages.Add($"{property.Name} is invalid (number must be greater than 0)");
+                errors.Add($"{property.Name} is invalid (number must be greater than 0)");
             }
         }
 
-        return errorMessages;
+        if (errors.Count > 0)
+            throw new ErrorOrValidationException(errors);
+
+        var editionsDb = await _repository.GetEditionsAsync();
+
+        if (editionsDb.Any(e => e.Year == edition.Year && 
+            e.BookId == edition.BookId && e.MediaId == edition.MediaId))
+                throw new ResourceConflictException("Edition already registered");
     }
 
     public async Task EditionLoanAsync(int id, DateTime date)
@@ -126,7 +130,7 @@ public class EditionService : IEditionService
             throw new ResourceConflictException("Edition has already been returned");
         
         edition.Status = 'D';
-        edition.UserId = userId;
+        edition.UserId = null;
 
         _repository.Update(edition);
         await _repository.SaveChangesAsync();

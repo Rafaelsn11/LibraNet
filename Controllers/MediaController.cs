@@ -38,6 +38,7 @@ public class MediaController : LibraNetBaseController
     [HttpPost]
     [ProducesResponseType(typeof(MediaDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Post([FromBody] MediaCreateDto media)
     {
         var mediaCreated = await _service.MediaCreateAsync(media);

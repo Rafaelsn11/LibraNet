@@ -43,10 +43,7 @@ public class BookService : IBookService
 
     public async Task<BookDto> BookCreateAsync(BookCreateDto book)
     {
-        var errors = ValidateBookCreate(book);
-
-        if (errors.Count > 0)
-            throw new ErrorOrValidationException(errors);
+        await ValidateBookCreate(book);
 
         var entity = new Book
         {
@@ -59,16 +56,22 @@ public class BookService : IBookService
 
         return new BookDto(entity.Id, entity.Title, entity.Subject);
     }
-    private List<string> ValidateBookCreate(BookCreateDto book)
+    private async Task ValidateBookCreate(BookCreateDto book)
     {
-        var errorMessages = new List<string>();
+        var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(book.Title))
-            errorMessages.Add("Title invalid");
+            errors.Add("Title invalid");
         if (string.IsNullOrWhiteSpace(book.Subject))
-            errorMessages.Add("Subject invalid");
+            errors.Add("Subject invalid");
 
-        return errorMessages;
+        if (errors.Count > 0)
+            throw new ErrorOrValidationException(errors);
+        
+        var booksDb = await _repository.GetBooksAsync();
+
+        if (booksDb.Any(b => b.Title.Equals(book.Title.Trim()) && b.Subject.Equals(book.Subject.Trim())))
+            throw new ResourceConflictException("Book already registered");
     }
 
     public async Task<BookUpdateViewDto> BookUpdateAsync(int id, BookUpdateDto book)

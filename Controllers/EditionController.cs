@@ -39,6 +39,7 @@ public class EditionController : LibraNetBaseController
     [HttpPost]
     [ProducesResponseType(typeof(EditionDto), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status409Conflict)]
     [AdminOnly]
     public async Task<IActionResult> Post([FromBody] EditionCreateDto edition)
     {

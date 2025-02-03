@@ -43,10 +43,7 @@ public class MediaService : IMediaService
 
     public async Task<MediaDto> MediaCreateAsync(MediaCreateDto media)
     {
-        var errors = ValidateMediaCreate(media);
-
-        if (errors.Count > 0)
-            throw new ErrorOrValidationException(errors);
+        await ValidateMediaCreate(media);
 
         var entity = new Media
         {
@@ -59,14 +56,20 @@ public class MediaService : IMediaService
         return new MediaDto(entity.Id, entity.Description);
     }
 
-    private List<string> ValidateMediaCreate(MediaCreateDto media)
+    private async Task ValidateMediaCreate(MediaCreateDto media)
     {
-        var errorMessages = new List<string>();
+        var errors = new List<string>();
 
         if (string.IsNullOrWhiteSpace(media.Description))
-            errorMessages.Add("Invalid description");
+            errors.Add("Invalid description");
+        
+        if (errors.Count > 0)
+            throw new ErrorOrValidationException(errors);
+        
+        var mediaDb = await _repository.GetMediaAsync();
 
-        return errorMessages;
+        if (mediaDb.Any(m => m.Description.Equals(media.Description.Trim())))
+            throw new ResourceConflictException("Media already registered");
     }
 
     public async Task<MediaUpdateViewDto> MediaUpdateAsync(int id, MediaUpdateDto media)
