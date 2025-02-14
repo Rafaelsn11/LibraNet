@@ -15,6 +15,7 @@ public class EditionRepository : BaseRepository, IEditionRepository
 
     public async Task<Edition> GetEditionByIdAsync(int id)
         => await _context.Editions
+            .AsNoTracking()
             .Include(b => b.Book)
             .Include(m => m.Media)
             .Where(x => x.Id == id)
@@ -22,6 +23,7 @@ public class EditionRepository : BaseRepository, IEditionRepository
 
     public async Task<IEnumerable<Edition>> GetEditionsAsync()
         => await _context.Editions
+            .AsNoTracking()
             .Include(b => b.Book)
             .Include(m => m.Media)
             .ToListAsync();

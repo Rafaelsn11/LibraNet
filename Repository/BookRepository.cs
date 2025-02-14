@@ -15,11 +15,13 @@ public class BookRepository : BaseRepository, IBookRepository
 
     public async Task<Book> GetBookByIdAsync(int id)
         => await _context.Books
+            .AsNoTracking()
             .Include(e => e.Editions)
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync();
 
     public async Task<IEnumerable<Book>> GetBooksAsync()
         => await _context.Books
+            .AsNoTracking()
             .ToListAsync();
 }
