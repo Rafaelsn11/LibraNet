@@ -100,6 +100,8 @@ public class EditionService : IEditionService
         var user = await _loggedUser.User();
         var userId = user.Id;
 
+        ValidateUserLoanLimit(user, date);
+
         var edition = await _repository.GetEditionByIdAsync(id);
 
         if (edition == null)
@@ -114,6 +116,14 @@ public class EditionService : IEditionService
 
         _repository.Update(edition);
         await _repository.SaveChangesAsync();
+    }
+
+    private void ValidateUserLoanLimit(User user, DateTime loanDate)
+    {
+        int maxLoans = loanDate.Month == user.BirthDate.Month ? 6 : 3;
+        
+        if (user.Loans.Count() >= maxLoans)
+            throw new ResourceConflictException("Limit on loans obtained");
     }
 
     public async Task EditionReturnAsync(int id)
