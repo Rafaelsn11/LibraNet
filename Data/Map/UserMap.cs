@@ -21,7 +21,9 @@ public class UserMap : BaseMap<User>
         builder.Property(x => x.BirthDate).HasColumnName("birth_date").IsRequired();
         builder.Property(x => x.IsActive).HasColumnName("is_active");
         builder.HasKey(x => x.Id);
-        builder.Property(x => x.Id).HasColumnName("id")
-            .HasDefaultValueSql("gen_random_uuid()");
+        builder.Property(x => x.Id).HasColumnName("id");
+        builder.Property(x => x.UserIdentifier)
+            .HasDefaultValueSql("gen_random_uuid()")
+            .HasColumnName("user_identifier").IsRequired();
     }
 }

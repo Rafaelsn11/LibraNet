@@ -71,8 +71,8 @@ namespace LibraNet.Data.Migrations
                         .HasColumnType("character(1)")
                         .HasColumnName("status");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
+                    b.Property<int?>("UserId")
+                        .HasColumnType("integer")
                         .HasColumnName("user_id");
 
                     b.Property<int>("Year")
@@ -109,16 +109,43 @@ namespace LibraNet.Data.Migrations
                     b.ToTable("tb_media_formats", (string)null);
                 });
 
-            modelBuilder.Entity("LibraNet.Models.Entities.User", b =>
+            modelBuilder.Entity("LibraNet.Models.Entities.Role", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("RoleIdentifier")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("id")
+                        .HasColumnName("role_identifier")
                         .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("timestamp with time zone")
+                    b.Property<string>("RoleName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("role_name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tb_roles", (string)null);
+                });
+
+            modelBuilder.Entity("LibraNet.Models.Entities.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date")
                         .HasColumnName("birth_date");
 
                     b.Property<string>("Email")
@@ -135,9 +162,42 @@ namespace LibraNet.Data.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("password");
+
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("salt");
+
+                    b.Property<Guid>("UserIdentifier")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_identifier")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
                     b.HasKey("Id");
 
                     b.ToTable("tb_users", (string)null);
+                });
+
+            modelBuilder.Entity("LibraNet.Models.Entities.UserRole", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer")
+                        .HasColumnName("role_id");
+
+                    b.HasKey("UserId", "RoleId");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("tb_user_roles", (string)null);
                 });
 
             modelBuilder.Entity("LibraNet.Models.Entities.Edition", b =>
@@ -157,12 +217,30 @@ namespace LibraNet.Data.Migrations
                     b.HasOne("LibraNet.Models.Entities.User", "User")
                         .WithMany("Loans")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.SetNull);
 
                     b.Navigation("Book");
 
                     b.Navigation("Media");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("LibraNet.Models.Entities.UserRole", b =>
+                {
+                    b.HasOne("LibraNet.Models.Entities.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("LibraNet.Models.Entities.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Role");
 
                     b.Navigation("User");
                 });
@@ -177,9 +255,16 @@ namespace LibraNet.Data.Migrations
                     b.Navigation("Editions");
                 });
 
+            modelBuilder.Entity("LibraNet.Models.Entities.Role", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("LibraNet.Models.Entities.User", b =>
                 {
                     b.Navigation("Loans");
+
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,12 +1,13 @@
+using LibraNet.Attributes;
+using LibraNet.Exceptions.ResponseError;
 using LibraNet.Models.Dtos.Book;
 using LibraNet.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraNet.Controllers;
 
-[ApiController]
-[Route("api/[controller]")]
-public class BookController : ControllerBase
+[AdminOnly]
+public class BookController : LibraNetBaseController
 {
     private readonly IBookService _service;
     public BookController(IBookService service)
@@ -15,6 +16,7 @@ public class BookController : ControllerBase
     }
 
     [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<BookListDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Get()
     {
         var books = await _service.GetBooksAsync();
@@ -24,6 +26,8 @@ public class BookController : ControllerBase
 
     [HttpGet]
     [Route("{id}")]
+    [ProducesResponseType(typeof(BookDetailDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var book = await _service.GetBookByIdAsync(id);
@@ -31,6 +35,9 @@ public class BookController : ControllerBase
     }
 
     [HttpPost]
+    [ProducesResponseType(typeof(BookDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status409Conflict)]
     public async Task<IActionResult> Post([FromBody] BookCreateDto book)
     {
         var bookCreated = await _service.BookCreateAsync(book);
@@ -40,6 +47,8 @@ public class BookController : ControllerBase
 
     [HttpPut]
     [Route("{id}")]
+    [ProducesResponseType(typeof(BookUpdateViewDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Put([FromRoute] int id,
         [FromBody] BookUpdateDto book)
     {
@@ -50,6 +59,8 @@ public class BookController : ControllerBase
 
     [HttpDelete]
     [Route("{id}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ResponseErrorsJson), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete([FromRoute] int id)
     {
         await _service.BookDeleteAsync(id);

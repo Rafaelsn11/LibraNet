@@ -15,11 +15,13 @@ public class MediaRepository : BaseRepository, IMediaRepository
 
     public async Task<Media> GetMediaByIdAsync(int id)
         => await _context.MediaFormats
+            .AsNoTracking()
             .Include(e => e.Editions)
             .Where(x => x.Id == id)
             .FirstOrDefaultAsync();
 
     public async Task<IEnumerable<Media>> GetMediaAsync()
         => await _context.MediaFormats
+            .AsNoTracking()
             .ToListAsync();
 }

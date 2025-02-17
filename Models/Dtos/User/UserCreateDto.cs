@@ -4,5 +4,6 @@ public record UserCreateDto
 (
     string Name,
     string Email,
-    DateTime BirthDate
+    string Password,
+    DateOnly BirthDate
 );

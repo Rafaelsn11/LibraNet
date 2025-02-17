@@ -35,7 +35,7 @@ public class EditionMap : BaseMap<Edition>
             .WithMany(u => u.Loans)
             .HasForeignKey(x => x.UserId)
             .OnDelete(DeleteBehavior.SetNull);
-        builder.Property(x => x.UserId).HasColumnName("user_id");
+        builder.Property(x => x.UserId).HasColumnName("user_id").IsRequired(false);
 
     }
 }

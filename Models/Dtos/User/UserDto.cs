@@ -1,8 +1,9 @@
+using LibraNet.Models.Dtos.Token;
+
 namespace LibraNet.Models.Dtos.User;
 
 public record UserDto
 (
-    Guid Id,
     string Name,
-    DateTime BirthDate
+    TokenDto Tokens
 );

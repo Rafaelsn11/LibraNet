@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LibraNet.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreateDatabase : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -43,10 +43,14 @@ namespace LibraNet.Data.Migrations
                 name: "tb_users",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_identifier = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     name = table.Column<string>(type: "text", nullable: false),
                     email = table.Column<string>(type: "text", nullable: false),
-                    birth_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    password = table.Column<string>(type: "text", nullable: false),
+                    salt = table.Column<string>(type: "text", nullable: false),
+                    birth_date = table.Column<DateOnly>(type: "date", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -65,7 +69,7 @@ namespace LibraNet.Data.Migrations
                     last_loan_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     book_id = table.Column<int>(type: "integer", nullable: false),
                     media_id = table.Column<int>(type: "integer", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    user_id = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
