@@ -29,7 +29,7 @@ LibraNET is a .NET-based API for managing libraries, book editions, media format
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/LibraNET.git
+   git clone https://github.com/Rafaelsn11/LibraNet.git
 2. Create appsettings.Development.json according to Template.
 3. Create a .env file and set the following values according to your application needs:
     ```
