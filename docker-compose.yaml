@@ -14,7 +14,9 @@ services:
       - "Settings__Password__AdditionalKey=${SETTINGS_PASSWORD_ADDITIONAL_KEY}"
       - "Settings__Jwt__ExpirationTimeMinutes=${SETTINGS_JWT_EXPIRATION_TIME_MINUTES}"
       - "Settings__Jwt__SigningKey=${SETTINGS_JWT_SIGNING_KEY}"
-    depends_on: ["libra-net-postgres"]
+    depends_on: 
+      libra-net-postgres:
+        condition: service_healthy
     networks:
       libra-net-networks:
 
@@ -30,6 +32,12 @@ services:
         aliases:
           - "host"
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
   
   pgadmin:
     image: dpage/pgadmin4
